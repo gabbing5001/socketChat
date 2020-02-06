@@ -26,8 +26,9 @@ public class PushClientFrame extends JFrame {
 	private JTextField serverMsg = null;
 	private JTextField ipField = null;
 	private JTextField portField = null;
+	JScrollPane scroll = null;
 
-	BufferedReader in = null;// 클라이언트는 받기만 함으로 out은 하지 않는다.
+	BufferedReader in = null;
 	private BufferedWriter out = null;
 
 	public PushClientFrame() {
@@ -40,7 +41,9 @@ public class PushClientFrame extends JFrame {
 		c.setLayout(new FlowLayout());
 		c.add(startBtn);
 		ipField = new JTextField(10);
+		ipField.setText("localhost");
 		portField = new JTextField(10);
+		portField.setText("9999");
 
 		
 
@@ -55,8 +58,8 @@ public class PushClientFrame extends JFrame {
 
 		c.add(serverMsg);
 
-		JScrollPane scroll = new JScrollPane(text);
-		scroll.setPreferredSize(new Dimension(300, 125));
+		scroll = new JScrollPane(text);
+		scroll.setPreferredSize(new Dimension(300, 200));
 		
 		c.add(scroll, BorderLayout.SOUTH);
 		setSize(400, 400);
@@ -83,6 +86,7 @@ public class PushClientFrame extends JFrame {
 			String msg = t.getText(); // 메세지 읽어
 			t.setText(""); // 읽고 나면 지워
 			text.append(msg + "\n"); // 클라이언트에서 한 줄 띄워서 보여줘
+			scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 			try {
 				out.write(msg + "\n");
 				out.flush(); // 보낸다.
@@ -100,11 +104,10 @@ public class PushClientFrame extends JFrame {
 			while (true) {
 				try {
 					inputMessage = in.readLine();
-
-					this.append(inputMessage); // 텍스트area에 메세지를 찍는다.
+					this.append(inputMessage + "\n"); // 텍스트area에 메세지를 찍는다.
+					scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					handleError(e.getMessage()); // 상대가 끈어버림
 				} // 클라이언트에서 한 행의 문자열 읽음
 			}
 		}

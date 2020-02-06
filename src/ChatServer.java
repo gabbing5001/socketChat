@@ -22,6 +22,7 @@ public class ChatServer extends JFrame implements ActionListener {
 	private Receiver clientMsg = null;
 	private ServerSocket listener = null;
 	private Socket socket = null;
+	private JScrollPane scroll = null;
 
 	public ChatServer() {
 		setTitle("채팅서버");
@@ -39,7 +40,8 @@ public class ChatServer extends JFrame implements ActionListener {
 		c.add(serverMsg, BorderLayout.NORTH);
 
 		clientMsg = new Receiver();
-		c.add(new JScrollPane(clientMsg), BorderLayout.CENTER);
+		scroll = new JScrollPane(clientMsg);
+		c.add(scroll, BorderLayout.CENTER);
 
 		setSize(400, 200);
 		setVisible(true);
@@ -57,6 +59,7 @@ public class ChatServer extends JFrame implements ActionListener {
 		String msg = t.getText(); // 메세지 읽어
 		t.setText(""); // 읽고 나면 지워
 		clientMsg.append(msg + "\n"); // 클라이언트에서 한 줄 띄워서 보여줘
+		scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 
 		try {
 			out.write(msg + "\n");
@@ -73,12 +76,7 @@ public class ChatServer extends JFrame implements ActionListener {
 			socket = listener.accept();
 			clientMsg.append("클라이언트로부터 접속!!\n");
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // 여기까지
-																						// 하면
-																						// 네트워크연결을
-																						// 받아올
-																						// 수
-																						// 있다.
+			out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // 여기까지 하면 네트워크 연결 받기 가능
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			handleError(e.getMessage());
@@ -98,6 +96,7 @@ public class ChatServer extends JFrame implements ActionListener {
 				try {
 					String msg = in.readLine(); // 읽어봅니다.
 					this.append(msg + "\n"); // 날아온걸 어팬드
+					scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 				} catch (IOException e) {
 					handleError(e.getMessage()); // 상대가 끈어버림
 				}
